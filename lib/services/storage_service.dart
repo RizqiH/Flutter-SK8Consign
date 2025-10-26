@@ -45,6 +45,32 @@ class StorageService {
     return null;
   }
 
+  // Simpan user data (static method)
+  static Future<void> saveUserStatic(User user) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(_userKey, jsonEncode(user.toJson()));
+  }
+
+  // Get token (static method)
+  static Future<String?> getTokenStatic() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString(_tokenKey);
+  }
+
+  // Hapus semua data (logout) - static method
+  static Future<void> clearStorage() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove(_tokenKey);
+    await prefs.remove(_userKey);
+  }
+
+  // Hapus semua data (logout) - static method alias
+  static Future<void> clearStorageStatic() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove(_tokenKey);
+    await prefs.remove(_userKey);
+  }
+
   // Hapus semua data (logout)
   Future<void> clearAll() async {
     final prefs = await SharedPreferences.getInstance();

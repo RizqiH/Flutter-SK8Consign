@@ -5,9 +5,10 @@ class User {
   final String email;
   final String? fullName;
   final String? phone;
-  final String? role;
+  final String role;
   final bool? isActive;
   final String? token;
+  final DateTime? createdAt;
 
   User({
     required this.id,
@@ -15,9 +16,10 @@ class User {
     required this.email,
     this.fullName,
     this.phone,
-    this.role,
+    required this.role,
     this.isActive,
     this.token,
+    this.createdAt,
   });
 
   // Konversi dari JSON ke User object
@@ -31,6 +33,9 @@ class User {
       role: json['role'] ?? 'user',
       isActive: json['is_active'] ?? true,
       token: json['token'],
+      createdAt: json['created_at'] != null
+          ? DateTime.parse(json['created_at'])
+          : null,
     );
   }
 
@@ -45,6 +50,7 @@ class User {
       'role': role,
       'is_active': isActive,
       'token': token,
+      if (createdAt != null) 'created_at': createdAt!.toIso8601String(),
     };
   }
 }

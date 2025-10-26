@@ -69,17 +69,16 @@ func Connect() {
 func AutoMigrate() {
 	log.Println("🔄 Running database migrations...")
 
-	// List all models to migrate
-	models := []interface{}{
+	modelsToMigrate := []interface{}{
 		&models.User{},
-		// Add more models here as your app grows:
-		// &models.Product{},
-		// &models.Order{},
-		// &models.Category{},
+		&models.Product{},
+		&models.Cart{},
+		&models.Order{},
+		&models.OrderItem{},
+		&models.Notification{},
 	}
 
-	// Run migration
-	if err := DB.AutoMigrate(models...); err != nil {
+	if err := DB.AutoMigrate(modelsToMigrate...); err != nil {
 		log.Fatal("❌ Migration failed:", err)
 	}
 

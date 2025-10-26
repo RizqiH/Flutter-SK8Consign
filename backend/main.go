@@ -9,6 +9,7 @@ import (
 	"sk8consign-backend/config"
 	"sk8consign-backend/database"
 	"sk8consign-backend/handlers"
+	"sk8consign-backend/middleware"
 
 	"github.com/rs/cors"
 )
@@ -45,12 +46,40 @@ func main() {
 func setupRoutes() *http.ServeMux {
 	mux := http.NewServeMux()
 
-	// Initialize handlers
 	authHandler := handlers.NewAuthHandler()
 
-	// API Routes
 	mux.HandleFunc("/api/login", authHandler.Login)
 	mux.HandleFunc("/api/register", authHandler.Register)
+
+	mux.HandleFunc("/api/profile", middleware.AuthMiddleware(handlers.GetProfile))
+	mux.HandleFunc("/api/profile/update", middleware.AuthMiddleware(handlers.UpdateProfile))
+	mux.HandleFunc("/api/profile/change-password", middleware.AuthMiddleware(handlers.ChangePassword))
+
+	mux.HandleFunc("/api/products/search", handlers.SearchProducts)
+	mux.HandleFunc("/api/products/detail", handlers.GetProductDetail)
+	mux.HandleFunc("/api/products/user", handlers.GetUserProducts)
+	mux.HandleFunc("/api/products/create", middleware.RequireAdmin(handlers.CreateProduct))
+	mux.HandleFunc("/api/products/update", middleware.RequireAuth(handlers.UpdateProduct))
+	mux.HandleFunc("/api/products/delete", middleware.RequireAuth(handlers.DeleteProduct))
+	mux.HandleFunc("/api/products/categories", handlers.GetCategories)
+
+	mux.HandleFunc("/api/cart", middleware.AuthMiddleware(handlers.GetCart))
+	mux.HandleFunc("/api/cart/add", middleware.AuthMiddleware(handlers.AddToCart))
+	mux.HandleFunc("/api/cart/update", middleware.AuthMiddleware(handlers.UpdateCart))
+	mux.HandleFunc("/api/cart/remove", middleware.AuthMiddleware(handlers.RemoveFromCart))
+	mux.HandleFunc("/api/cart/clear", middleware.AuthMiddleware(handlers.ClearCart))
+
+	mux.HandleFunc("/api/orders", middleware.AuthMiddleware(handlers.GetUserOrders))
+	mux.HandleFunc("/api/orders/create", middleware.AuthMiddleware(handlers.CreateOrder))
+	mux.HandleFunc("/api/orders/detail", middleware.AuthMiddleware(handlers.GetOrderDetail))
+	mux.HandleFunc("/api/orders/update-status", middleware.AuthMiddleware(handlers.UpdateOrderStatus))
+	mux.HandleFunc("/api/orders/update-payment", middleware.AuthMiddleware(handlers.UpdatePaymentStatus))
+
+	mux.HandleFunc("/api/notifications", middleware.AuthMiddleware(handlers.GetNotifications))
+	mux.HandleFunc("/api/notifications/read", middleware.AuthMiddleware(handlers.MarkNotificationRead))
+	mux.HandleFunc("/api/notifications/read-all", middleware.AuthMiddleware(handlers.MarkAllNotificationsRead))
+	mux.HandleFunc("/api/notifications/unread-count", middleware.AuthMiddleware(handlers.GetUnreadCount))
+
 	mux.HandleFunc("/api/health", handlers.HealthCheck)
 
 	return mux
@@ -84,9 +113,46 @@ func startServer(handler http.Handler) {
 	log.Printf("🌍 Environment: %s\n", config.AppConfig.Env)
 	log.Println()
 	log.Println("📱 Available Endpoints:")
-	log.Println("   POST   /api/register     - Create new user account")
-	log.Println("   POST   /api/login        - User authentication")
-	log.Println("   GET    /api/health       - Health check")
+	log.Println("   [Auth]")
+	log.Println("   POST   /api/register")
+	log.Println("   POST   /api/login")
+	log.Println()
+	log.Println("   [Profile]")
+	log.Println("   POST   /api/profile")
+	log.Println("   PUT    /api/profile/update")
+	log.Println("   PUT    /api/profile/change-password")
+	log.Println()
+	log.Println("   [Products]")
+	log.Println("   POST   /api/products/search")
+	log.Println("   GET    /api/products/detail")
+	log.Println("   GET    /api/products/user")
+	log.Println("   POST   /api/products/create")
+	log.Println("   PUT    /api/products/update")
+	log.Println("   DELETE /api/products/delete")
+	log.Println("   GET    /api/products/categories")
+	log.Println()
+	log.Println("   [Cart]")
+	log.Println("   GET    /api/cart")
+	log.Println("   POST   /api/cart/add")
+	log.Println("   PUT    /api/cart/update")
+	log.Println("   DELETE /api/cart/remove")
+	log.Println("   DELETE /api/cart/clear")
+	log.Println()
+	log.Println("   [Orders]")
+	log.Println("   GET    /api/orders")
+	log.Println("   POST   /api/orders/create")
+	log.Println("   GET    /api/orders/detail")
+	log.Println("   PUT    /api/orders/update-status")
+	log.Println("   PUT    /api/orders/update-payment")
+	log.Println()
+	log.Println("   [Notifications]")
+	log.Println("   GET    /api/notifications")
+	log.Println("   PUT    /api/notifications/read")
+	log.Println("   PUT    /api/notifications/read-all")
+	log.Println("   GET    /api/notifications/unread-count")
+	log.Println()
+	log.Println("   [System]")
+	log.Println("   GET    /api/health")
 	log.Println()
 	log.Println("💾 Database:")
 	log.Printf("   Host: %s:%s\n", config.AppConfig.DBHost, config.AppConfig.DBPort)

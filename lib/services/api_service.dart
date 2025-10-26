@@ -25,12 +25,14 @@ class ApiService {
       if (response.statusCode == 200) {
         // Login berhasil
         final data = jsonDecode(response.body);
-        
+
         // Response structure baru: { success, message, token, data: { user: {...} } }
         return {
           'success': true,
           'message': data['message'] ?? 'Login berhasil',
-          'user': User.fromJson(data['data']['user']), // ⚠️ Perhatikan 'data.user'
+          'user': User.fromJson(
+            data['data']['user'],
+          ), // ⚠️ Perhatikan 'data.user'
           'token': data['token'],
         };
       } else {

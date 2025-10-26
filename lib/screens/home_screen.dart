@@ -39,22 +39,31 @@ class _HomeScreenState extends State<HomeScreen> {
     setState(() {
       _selectedIndex = index;
     });
-    
-    // TODO: Navigate to different screens based on index
+
     switch (index) {
-      case 0: // Home
+      case 0:
         break;
-      case 1: // Search
-        // Navigate to search screen
+      case 1:
+        Navigator.pushNamed(context, '/search');
         break;
-      case 2: // Add
-        // Navigate to add item screen
+      case 2:
+        if (currentUser?.role == 'admin') {
+          Navigator.pushNamed(context, '/add-product');
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Only admin can add products'),
+              backgroundColor: Colors.red,
+              duration: Duration(seconds: 2),
+            ),
+          );
+        }
         break;
-      case 3: // Cart
-        // Navigate to cart screen
+      case 3:
+        Navigator.pushNamed(context, '/cart');
         break;
-      case 4: // Profile
-        // Navigate to profile screen
+      case 4:
+        Navigator.pushNamed(context, '/profile');
         break;
     }
   }
@@ -121,13 +130,7 @@ class _HomeScreenState extends State<HomeScreen> {
                               color: Colors.white,
                             ),
                             onPressed: () {
-                              // TODO: Navigate to notifications
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                  content: Text('Notifications coming soon!'),
-                                  duration: Duration(seconds: 1),
-                                ),
-                              );
+                              Navigator.pushNamed(context, '/notifications');
                             },
                           ),
                         ),
@@ -143,13 +146,7 @@ class _HomeScreenState extends State<HomeScreen> {
                               color: Colors.white,
                             ),
                             onPressed: () {
-                              // TODO: Navigate to settings
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                  content: Text('Settings coming soon!'),
-                                  duration: Duration(seconds: 1),
-                                ),
-                              );
+                              Navigator.pushNamed(context, '/settings');
                             },
                           ),
                         ),
@@ -603,7 +600,8 @@ class _HomeScreenState extends State<HomeScreen> {
               children: [
                 _buildNavItem(Icons.home, 0),
                 _buildNavItem(Icons.search, 1),
-                _buildCenterAddButton(),
+                if (currentUser?.role == 'admin') _buildCenterAddButton(),
+                if (currentUser?.role != 'admin') const SizedBox(width: 60),
                 _buildNavItem(Icons.shopping_cart, 3),
                 _buildNavItem(Icons.person, 4),
               ],
@@ -629,25 +627,16 @@ class _HomeScreenState extends State<HomeScreen> {
         decoration: BoxDecoration(
           color: const Color(0xFF2A2A4E),
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(
-            color: Colors.white.withOpacity(0.1),
-          ),
+          border: Border.all(color: Colors.white.withOpacity(0.1)),
         ),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(
-              icon,
-              color: Colors.white,
-              size: 32,
-            ),
+            Icon(icon, color: Colors.white, size: 32),
             const SizedBox(height: 8),
             Text(
               label,
-              style: const TextStyle(
-                color: Colors.white,
-                fontSize: 11,
-              ),
+              style: const TextStyle(color: Colors.white, fontSize: 11),
               textAlign: TextAlign.center,
             ),
           ],
@@ -684,10 +673,7 @@ class _HomeScreenState extends State<HomeScreen> {
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
             colors: isSelected
-                ? [
-                    const Color(0xFF6B5FED),
-                    const Color(0xFFE94DA3),
-                  ]
+                ? [const Color(0xFF6B5FED), const Color(0xFFE94DA3)]
                 : [
                     const Color(0xFF6B5FED).withOpacity(0.5),
                     const Color(0xFFE94DA3).withOpacity(0.5),
@@ -701,10 +687,28 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
           ],
         ),
-        child: const Icon(
-          Icons.add,
-          color: Colors.white,
-          size: 32,
+        child: Stack(
+          children: [
+            const Center(
+              child: Icon(Icons.add, color: Colors.white, size: 32),
+            ),
+            Positioned(
+              top: 8,
+              right: 8,
+              child: Container(
+                padding: const EdgeInsets.all(2),
+                decoration: const BoxDecoration(
+                  color: Colors.orange,
+                  shape: BoxShape.circle,
+                ),
+                child: const Icon(
+                  Icons.admin_panel_settings,
+                  size: 12,
+                  color: Colors.white,
+                ),
+              ),
+            ),
+          ],
         ),
       ),
     );
