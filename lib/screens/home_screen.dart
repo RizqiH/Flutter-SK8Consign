@@ -44,7 +44,7 @@ class _HomeScreenState extends State<HomeScreen> {
       case 0:
         break;
       case 1:
-        Navigator.pushNamed(context, '/search');
+        Navigator.pushNamed(context, '/products');
         break;
       case 2:
         if (currentUser?.role == 'admin') {
@@ -599,7 +599,7 @@ class _HomeScreenState extends State<HomeScreen> {
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
                 _buildNavItem(Icons.home, 0),
-                _buildNavItem(Icons.search, 1),
+                _buildNavItem(Icons.shopping_bag_outlined, 1),
                 if (currentUser?.role == 'admin') _buildCenterAddButton(),
                 if (currentUser?.role != 'admin') const SizedBox(width: 60),
                 _buildNavItem(Icons.shopping_cart, 3),
